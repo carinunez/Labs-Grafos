@@ -6,4 +6,4 @@ Integrantes:
 - Carolina Núñez
 - Hecmar Taucare
 
-![](hamster.jpeg)
+![](hamster.jpg)

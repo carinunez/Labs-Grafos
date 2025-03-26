@@ -5,3 +5,5 @@ En cada carpeta se encontrarán los laboratorios realizados.
 Integrantes:
 - Carolina Núñez
 - Hecmar Taucare
+
+![](hamster.jpeg)

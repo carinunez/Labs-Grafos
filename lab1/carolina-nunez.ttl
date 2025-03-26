@@ -2,18 +2,18 @@
 @prefix foaf: <http://xmlns.com/foaf/0.1/> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix : <http://example.org/universidadDeChile#> .
+@prefix yo: <http://example.org/caronunez> .
 
-:Estudiante rdfs:subclassof foaf:Person.
+yo:Estudiante rdfs:subclassof foaf:Person .
 
-:estudiaEn a rdf:Property ;
-    rdfs:domain :Person ;
+yo:estudiaEn a rdf:Property ;
+    rdfs:domain yo:Estudiante ;
     rdfs:range <https://www.wikidata.org/entity/Q10387767>.
 
 <#YO> a foaf:Person ;
     foaf:name "CarolinaNunez" ;
     foaf:mbox "caro@gmail.com";
-    foaf:img <https://github.com/carinunez/Labs-Grafos/blob/main/mabel_gravity_falls.jpg>;
+    foaf:img <https://github.com/carinunez/Labs-Grafos/blob/main/lab1/mabel_gravity_falls.jpg>;
     foaf:page <https://www.instagram.com/carinunezz/>;
     foaf:knows <https://renato-pino.com>, <http://lmaldonado.cl>;
     foaf:estudiaEn  <https://www.wikidata.org/entity/Q232141>.

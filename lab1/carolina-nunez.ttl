@@ -16,4 +16,4 @@ yo:estudiaEn a rdf:Property ;
     foaf:img <https://github.com/carinunez/Labs-Grafos/blob/main/lab1/mabel_gravity_falls.jpg>;
     foaf:page <https://www.instagram.com/carinunezz/>;
     foaf:knows <https://renato-pino.com>, <http://lmaldonado.cl>;
-    foaf:estudiaEn  <https://www.wikidata.org/entity/Q232141>.
+    yo:estudiaEn  <https://www.wikidata.org/entity/Q232141>.

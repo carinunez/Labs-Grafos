@@ -63,7 +63,7 @@
 #P8
 # Encontrar las personas que solo se han casado con Valyrian
 :OnlyMarriesValyrians owl:equivalentClass[
-    owl:hasValue :Valyrian;
+    owl:allValuesFrom :Valyrian;
     owl:onProperty :hasSpouse
 ] .
 

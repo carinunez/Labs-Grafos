@@ -57,8 +57,7 @@
 # P7
 # Como hay una distribución binaria, entre Valyrian y Andal
 # debería usar el complemento
-:Andal owl:equivalentClass [
-    owl:intersectionOf ( :House [owl:complementOf :Valyrian ])].
+:Andal owl:equivalentClass [owl:complementOf :Valyrian ].
 
 
 #P8

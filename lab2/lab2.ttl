@@ -1,0 +1,70 @@
+# Agregar sibling a mano
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+
+
+# P1
+:hasSpouse a owl:SymmetricProperty .
+:engagedTo a owl:SymmetricProperty .
+
+# P2
+:hasParent owl:inverseOf :hasChild .
+
+# P3
+:ancestorOf owl:sameAs :hasChild .
+:ancestorOf a owl:TransitiveProperty .
+
+# P4
+# Para encontrar a los hermanos y me devuelvo al nodo del
+# padre y luego bajo hacia sus hijos
+
+:sibling a owl:SymmetricProperty ;
+    owl:propertyChainAxiom(
+        [owl:inverseOf:hasChild]
+        :hasChild
+    ) .
+# Me faltó agregar alguna condicion para que una pesona no 
+# pueda ser herman@ de sí misma, con ello se evita que
+# 2 hermanos sean vistos como primos.
+
+:hasCousin owl:propertyChainAxiom(
+    [owl:inverseOf :hasChild]
+    :sibling
+    :hasChild
+    ) . 
+
+
+# P5
+:Targaryen owl:equivalentClass [
+    owl:hasValue :HouseTargaryen;
+    owl:onProperty :memberOf
+] .
+
+# P6
+# para ser Valyrian debe pertenecer a cualquiera de 
+# las casas especificadas.
+# iMPORTANTE: Las personas son Valyrian no el conjunto de Casas
+:Valyrian owl:equivalentClass [
+    owl:unionOf (
+        [owl:hasValue :HouseTargaryen ; owl:onProperty :memberOf] 
+        [owl:hasValue :HouseCeltigar ; owl:onProperty :memberOf]
+        [owl:hasValue :HouseVelaryon ; owl:onProperty :memberOf]
+)
+] .
+
+# P7
+# Como hay una distribución binaria, entre Valyrian y Andal
+# debería usar el complemento
+:Andal owl:equivalentClass [
+    owl:intersectionOf ( :House [owl:complementOf :Valyrian ])].
+
+
+#P8
+# Encontrar las personas que solo se han casado con Valyrian
+:OnlyMarriesValyrians owl:equivalentClass[
+    owl:hasValue :Valyrian;
+    owl:onProperty :hasSpouse
+] .
+

@@ -1,0 +1,184 @@
+
+# Data 1 Shapes 1 
+@prefix ex: <http://example.org#> .
+@prefix dash: <http://datashapes.org/dash#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+
+
+# P1
+
+ex:PersonShape a sh:NodeShape ;
+    sh:targetClass foaf:Person ;
+    sh:property [
+       sh:path foaf:birthday ;
+       sh:datatype xsd:date ;
+    ] .
+
+# error en el tipo de dato de birthday, se tenía 
+# string en lugar de date
+
+# P2 shapes adicionales 
+
+    sh:property [
+       sh:path foaf:givenName ;
+       sh:datatype xsd:string ;
+    ] .
+
+    sh:property [
+       sh:path foaf:name ;
+       sh:datatype xsd:string ;
+    ] ;
+
+    sh:property [
+       sh:path foaf:familyName ;
+       sh:datatype xsd:string ;
+    ] .
+
+# P3 restricción con alternativePath
+# Alternative path verifica que algunos de los path
+# especificados cumplan la condición
+
+ex:PersonShape a sh:NodeShape ;
+    sh:targetClass foaf:Person ;
+    sh:property [
+      sh:path [ 
+        sh:alternativePath (:givenName :name :familyName) ;
+      sh:datatype xsd:string 
+    ]] .
+
+
+# @prefix ex: <http://example.org#> .
+# @prefix dash: <http://datashapes.org/dash#> .
+# @prefix sh: <http://www.w3.org/ns/shacl#> .
+# @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+# @prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+# @prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+# @prefix nobel: <http://data.nobelprize.org/terms/> .
+# @prefix dbo:   <http://dbpedia.org/ontology/> .
+# @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+# @prefix dbp:   <http://dbpedia.org/property/> .
+
+
+# P4
+
+# Solo una de las afiliaciones es una U
+
+ex:LaureateShape a sh:NodeShape ;
+    sh:targetClass nobel:Laureate ;
+	sh:property [
+      sh:path dbo:affiliation ;
+      sh:class dbo:University ;
+      sh:minCount 1 ;
+] .
+
+
+# P5 
+
+# ex:LaureateShape a sh:NodeShape ;
+#     sh:targetClass nobel:Laureate ;
+# 	sh:property [
+#       sh:path dbo:affiliation ;
+#       sh:minCount 1 ;
+#       sh:qualifiedValueShape [
+#         sh:path dbo:University ;
+#         sh:hasValue dbo:university ;
+#         ] ;
+#         sh:qualifiedMinCount 0
+# ] .
+ex:LaureateShape a sh:NodeShape ;
+    sh:targetClass foaf:Person ;
+	sh:property [ 
+      sh:path dbo:affiliation ;
+      sh:minCount 1 ;
+      sh:qualifiedValueShape [
+        sh:path rdf:type ;
+          sh:hasValue dbo:University ];
+       sh:qualifiedMinCount 1 ;
+    ].
+
+# P6
+ex:LaureateShape a sh:NodeShape ;
+    sh:targetClass nobel:Laureate ;
+	sh:property [
+       sh:path dbp:dateOfBirth;
+        sh:equals foaf:birthday 
+] .
+# En caso de que una de las propiedades no esté definida,
+# no se valida la restriccion ya que compara con el valor que
+# si se tiene con un valor por default 1948-10-09
+
+# P7
+# Para que pase la validacion es necesario que tenga cumpleaños, 
+# fecha de nacimiento y que ambas sean iguales 
+ex:LaureateShape a sh:NodeShape ;
+    sh:targetClass nobel:Laureate ;
+      sh:and(
+        [sh:property [
+        	sh:path dbp:dateOfBirth ;
+            sh:minCount 1] ]
+        [sh:property [
+        	sh:path foaf:birthday ;
+            sh:minCount 1] ]
+        [sh:property [
+            sh:path dbp:dateOfBirth ;
+            sh:equals foaf:birthday ]
+	]) .
+
+# P8
+# Los datos se validan correctamente
+
+@prefix ex: <http://example.org#> .
+@prefix dash: <http://datashapes.org/dash#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix nobel: <http://data.nobelprize.org/terms/> .
+@prefix dbo:   <http://dbpedia.org/ontology/> .
+@prefix dbp:   <http://dbpedia.org/property/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+
+
+nobel:Laureate a sh:NodeShape ;
+	sh:targetClass foaf:Person ;
+    sh:property [
+       sh:path [
+           sh:alternativePath ( foaf:name foaf:givenName foaf:familyName);
+       ] ; 
+       sh:pattern "^[A-Za-zÁÉÍÓÚÑáéíóúñÇçÄäËëÏïÖöÜü ().-]{2,}$"
+    ] .
+
+# Agregué la mayor cantidad de carácteres distintos de _ y que no fueran 
+# números pero de todas formas habían nombres que no pasaban la validacion 
+# porque tenían ', los demás no pasaron la validación porque tenían números
+# en el nombre.
+
+# P9
+
+# Use in porque queremos comprobar que el valor de la propiedad del
+# nodo sea uno de los especificados. Si hubiese querido comparar los valores
+# en 2 nodos, debería usar equals
+nobel:LaureateAward a sh:NodeShape ;
+	sh:targetNode nobel:Laureate ;
+	sh:property [ 
+      sh:path nobel:share ;
+              sh:in ("1" "2" "3" "4")
+    ].
+
+# P10
+nobel:NobelPrize a sh:NodeShape ;
+	sh:targetNode nobel:Laureate ;
+	sh:propety [
+    # Se omite el AND debido a los paréntesis
+      [sh:path nobel:motivation ;
+               sh:minCount 1 ;
+      ][
+       sh:path nobel:motivation ;
+               sh:minLength 10 ;
+               sh:uniqueLang true]
+      # uniqueLang permite que haya una propiedad con 
+      # distintos literales, siempre y cuando estos 
+      # sean distintos en cada idioma
+      ].

@@ -1,0 +1,40 @@
+# LAB 4 SHAQL
+
+# P1
+SELECT ?entity
+WHERE {
+  ?entity rdfs:label "Universidad de Chile"@es.
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "es,en". }
+}
+
+# UChile : 
+
+# P2
+SELECT DISTINCT ?class
+WHERE {
+  wd:Q232141 wdt:P31 ?class
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "es,en". }
+}
+
+# Clases encontradas : 
+# wd:Q45400320
+# wd:Q875538
+# wd:Q31855
+
+# P3
+SELECT ?university
+WHERE {
+  ?university wdt:P31/wdt:279* wd:Q3918; # *: busca uan universidad en cualquier nivel cualquier 
+    wdt:P571 ?year;
+    wdt:P17/wdt:P30 wd:Q18. # Que esté en un pais o continente en America del Sur
+  # Busco el año de fundación de la UChile
+    wd:Q232141 wdt:P571 ?yearUChile 
+  FILTER ( # Universidades que se hayan fundado antes
+    YEAR(?year) < YEAR(?yearUChile))
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "es,en". }
+}
+# inception inception 571
+
+
+# P4
+# Buscar estudiantes en cualquier otra universidad chilena

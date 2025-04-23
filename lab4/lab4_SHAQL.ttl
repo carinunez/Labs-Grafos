@@ -24,7 +24,7 @@ WHERE {
 # P3
 SELECT ?university
 WHERE {
-  ?university wdt:P31/wdt:279* wd:Q3918; # *: busca uan universidad en cualquier nivel cualquier 
+  ?university wdt:P31/wdt:P279* wd:Q3918; # *: busca una universidad en cualquier nivel cualquier 
     wdt:P571 ?year;
     wdt:P17/wdt:P30 wd:Q18. # Que esté en un pais o continente en America del Sur
   # Busco el año de fundación de la UChile
@@ -36,5 +36,84 @@ WHERE {
 # inception inception 571
 
 
-# P4
-# Buscar estudiantes en cualquier otra universidad chilena
+# P4 CORREGIR
+# Primero buscamos las universidades chilenas
+SELECT ?Uchilenas ?UchilenasLabel
+WHERE {
+  ?Uchilenas wdt:P31/wdt:P279* wd:Q3918; # *: busca una universidad en cualquier nivel cualquier 
+    wdt:P17 wd:Q298. # Universidades Chilenas
+  # Busco el año de fundación de la UChile
+    wd:Q232141 wdt:P571 ?yearUChile 
+  FILTER(?)
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "es,en". }
+}
+
+
+
+#
+  
+#   FILTER (?Uchilenas = wd:Q232141)
+#   FILTER NOT EXISTS {
+#     ?estudiantes wdt:P69+ ?U_NoUchile.
+#     ?U_NoUchile wdt:P31/wdt:279* wd:Q3918; # *: busca una universidad en cualquier nivel 
+#       wdt:P17 wd:Q298.
+#     FILTER(?U_NoUchile != wd:Q232141)}
+
+# Primero buscamos las universidades chilenas
+# SELECT ?Uchilenas ?UchilenasLabel ?U_NoUchile ?U_NoUchileLabel ?estudiantes 
+# WHERE {
+#   # educated at -> P69
+#   ?estudiantes wdt:P31 wd:Q5;
+#           wdt:P69+ ?Uchilenas.
+#   ?Uchilenas wdt:P31/wdt:P279* wd:Q3918; # *: busca una universidad en cualquier nivel 
+#     wdt:P17 wd:Q298. # Universidades Chilenas
+#    FILTER(?Uchilenas = wd:Q232141 || ?Uchilenas != wd:Q232141) 
+
+#   SERVICE wikibase:label { bd:serviceParam wikibase:language "es,en". }
+# }
+
+# P5 POR HACER
+
+
+
+
+# P6
+SELECT ?persona ?personaLabel ?relacionUchile
+WHERE {
+  ?persona wdt:P31 wd:Q5;
+               wdt:P69|wdt:P108 wd:Q232141.
+BIND(
+  # Usar () dentro de otro () genera problemas, usar {}
+  IF( EXISTS { ?persona wdt:P69 wd:Q232141 }, "Estudiante", 
+    IF( EXISTS {?persona wdt:P108 wd:Q232141}, "Trabajador", 
+      "Otro"
+    ) ) AS ?relacionUchile
+)
+    SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" }
+}
+
+
+# P7 
+
+SELECT ?persona ?personaLabel ?relacionUchile ?fechaNacimiento ?pais
+WHERE {
+  ?persona wdt:P31 wd:Q5;
+               wdt:P69|wdt:P108 wd:Q232141.
+BIND(
+  IF( EXISTS { ?persona wdt:P69 wd:Q232141 }, "Estudiante", 
+    IF( EXISTS {?persona wdt:P108 wd:Q232141}, "Trabajador", 
+      "Otro"
+    ) ) AS ?relacionUchile
+)
+# date of birth P569
+# place of birth P19
+# Reviso si tiene fecha de nacimiento y también si tiene lugar de nacimiento,
+# a partir del lugar de nacimiento extraigo el país de nacimiento
+OPTIONAL {?persona wdt:P569 ?fechaNacimiento}
+OPTIONAL {?persona wdt:P19 ?lugarNacimiento.
+          ?lugarNacimiento wdt:P17 ?pais}
+    SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" }
+}
+
+
+# P8 POR HACER

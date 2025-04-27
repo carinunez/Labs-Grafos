@@ -6,8 +6,8 @@ WHERE {
   ?entity rdfs:label "Universidad de Chile"@es.
   SERVICE wikibase:label { bd:serviceParam wikibase:language "es,en". }
 }
-
-# UChile : 
+# Resultados: Q232141 ; Q3569732 ; Q4005840
+# UChile : Q232141
 
 # P2
 SELECT DISTINCT ?class
@@ -22,7 +22,9 @@ WHERE {
 # wd:Q31855
 
 # P3
-SELECT ?university
+# Para fundación usar inception P571
+
+SELECT ?university ?universityLabel
 WHERE {
   ?university wdt:P31/wdt:P279* wd:Q3918; # *: busca una universidad en cualquier nivel cualquier 
     wdt:P571 ?year;
@@ -33,49 +35,46 @@ WHERE {
     YEAR(?year) < YEAR(?yearUChile))
   SERVICE wikibase:label { bd:serviceParam wikibase:language "es,en". }
 }
-# inception inception 571
 
 
-# P4 CORREGIR
-# Primero buscamos las universidades chilenas
-SELECT ?Uchilenas ?UchilenasLabel
+# P4 
+SELECT ?estudiantesLabel ?U_NoUchileLabel
 WHERE {
-  ?Uchilenas wdt:P31/wdt:P279* wd:Q3918; # *: busca una universidad en cualquier nivel cualquier 
-    wdt:P17 wd:Q298. # Universidades Chilenas
-  # Busco el año de fundación de la UChile
-    wd:Q232141 wdt:P571 ?yearUChile 
-  FILTER(?)
+  # educated at -> P69
+  # Busco las personas que estudiaron en la Uchile y en otra U
+  ?estudiantes wdt:P31 wd:Q5; # busca personas 
+
+  # Dejo explicito que estudie en la Chile y en otra U para que se cumplan 
+  # ambas condiciones
+          wdt:P69 wd:Q232141; 
+          wdt:P69 ?U_NoUchile. # + cualquier otra u chilena
+
+  ?U_NoUchile wdt:P31/wdt:P279* wd:Q3918; # *: busca una universidad en cualquier nivel 
+             wdt:P17 wd:Q298. # Universidades Chilenas
+
+    FILTER(?U_NoUchile != wd:Q232141) 
+
   SERVICE wikibase:label { bd:serviceParam wikibase:language "es,en". }
 }
 
 
 
-#
-  
-#   FILTER (?Uchilenas = wd:Q232141)
-#   FILTER NOT EXISTS {
-#     ?estudiantes wdt:P69+ ?U_NoUchile.
-#     ?U_NoUchile wdt:P31/wdt:279* wd:Q3918; # *: busca una universidad en cualquier nivel 
-#       wdt:P17 wd:Q298.
-#     FILTER(?U_NoUchile != wd:Q232141)}
-
-# Primero buscamos las universidades chilenas
-# SELECT ?Uchilenas ?UchilenasLabel ?U_NoUchile ?U_NoUchileLabel ?estudiantes 
-# WHERE {
-#   # educated at -> P69
-#   ?estudiantes wdt:P31 wd:Q5;
-#           wdt:P69+ ?Uchilenas.
-#   ?Uchilenas wdt:P31/wdt:P279* wd:Q3918; # *: busca una universidad en cualquier nivel 
-#     wdt:P17 wd:Q298. # Universidades Chilenas
-#    FILTER(?Uchilenas = wd:Q232141 || ?Uchilenas != wd:Q232141) 
-
-#   SERVICE wikibase:label { bd:serviceParam wikibase:language "es,en". }
-# }
 
 # P5 POR HACER
 
+SELECT ?ocupacionLabel (COUNT(?estudiantes) AS ?cantidad)
+WHERE {
+  # educated at -> P69
+  # Busco las personas que estudiaron en la Uchile y en otra U
+  ?estudiantes wdt:P31 wd:Q5;
+          wdt:P69 wd:Q232141.
+  # ocupacion -> P106
+  ?estudiantes wdt:P106 ?ocupacion.
 
-
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "es,en". }
+}
+GROUP BY ?ocupacionLabel 
+ORDER BY DESC (?cant)
 
 # P6
 SELECT ?persona ?personaLabel ?relacionUchile
@@ -86,8 +85,8 @@ BIND(
   # Usar () dentro de otro () genera problemas, usar {}
   IF( EXISTS { ?persona wdt:P69 wd:Q232141 }, "Estudiante", 
     IF( EXISTS {?persona wdt:P108 wd:Q232141}, "Trabajador", 
-      "Otro"
-    ) ) AS ?relacionUchile
+      "Otro")
+    ) AS ?relacionUchile
 )
     SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" }
 }
@@ -117,3 +116,63 @@ OPTIONAL {?persona wdt:P19 ?lugarNacimiento.
 
 
 # P8 POR HACER
+# con esto el resultado es sólo el promedio
+
+# SELECT (AVG(?edad) AS ?promEdad)
+#   WHERE{ 
+  
+#   SELECT ?estudiantes ?estudiantesLabel ?edad
+#   WHERE {
+#     # educated at -> P69
+#     # Busco las personas que estudiaron en la Uchile y su fecha de nacimiento
+#     ?estudiantes wdt:P31 wd:Q5;
+#             wdt:P69 wd:Q232141;
+#             wdt:P569 ?fecha_nacimiento.
+  
+#     # encontrar los que están vivos, i.e no tienen fecha de muerte (P570)
+#     MINUS {?estudiantes wdt:P570 ?muerte}
+    
+#     # quite las personas que nacieron en el 1800s pero no tenían fecha de muerte
+#     FILTER (YEAR(?fecha_nacimiento) > 1900) 
+
+#     # calculo la edad de los vivos
+#     BIND( YEAR(NOW()) - YEAR(?fecha_nacimiento) AS ?edad)
+#     }
+#  }
+
+# RESPUESTA FINAL
+# Primero calculo la edad promedio (Consulta anidada) y luego aplico la condición 
+
+ SELECT ?estudiantes ?estudiantesLabel ?edad
+  WHERE{ 
+  # CONSULTA PARA CALCULAR EL PROM DE EDADES
+        {SELECT (AVG(?edad) AS ?promEdad)
+        WHERE {
+          # educated at -> P69
+          # Busco las personas que estudiaron en la Uchile y su fecha de nacimiento
+          ?estudiantes wdt:P31 wd:Q5;
+                  wdt:P69 wd:Q232141;
+                  wdt:P569 ?fecha_nacimiento.
+        
+          # encontrar los que están vivos, i.e no tienen fecha de muerte (P570)
+          MINUS {?estudiantes wdt:P570 ?muerte}
+          # quite las personas que nacieron en el 1800s pero no tenían fecha de muerte
+          FILTER (YEAR(?fecha_nacimiento) > 1900) 
+          # busco la edad de los vivos
+          BIND( YEAR(NOW()) - YEAR(?fecha_nacimiento) AS ?edad)
+          }}
+
+  # CONSULTA PARA LOS RESULTADOS
+  # Hago la misma consulta anterior pero ahora para retornar quienes son los estudiantes
+  # que cumplen con la condicion
+  ?estudiantes wdt:P31 wd:Q5;
+            wdt:P69 wd:Q232141;
+            wdt:P569 ?fecha_nacimiento.
+  
+    MINUS {?estudiantes wdt:P570 ?muerte}
+    BIND( YEAR(NOW()) - YEAR(?fecha_nacimiento) AS ?edad)
+    # Mantuve la condicion de haber nacido después del 1900 y 
+    # agrego que tengan edad mayor al promedio
+    FILTER ((YEAR(?fecha_nacimiento) > 1900) && ?edad > ?promEdad) 
+    SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],mul,en" }
+ }

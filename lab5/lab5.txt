@@ -1,0 +1,71 @@
+#  Grafo de propiedades 
+
+# P1
+MATCH (m:Movie)
+RETURN m.title, m.genre
+
+
+# P2
+MATCH (p)-[act:ACTED_IN ]->(m:Movie)
+WHERE m.title = 'Inception'
+RETURN p.name, act.role
+
+# P3
+MATCH (p)-[act:ACTED_IN ]->(m:Movie)
+WITH m.title AS title, COUNT(p.name) AS cant
+WHERE cant >2
+RETURN title
+
+# P4
+MATCH (p:Person) - [:DIRECTED] -> (m:Movie)
+MATCH (p:Person) - [act:ACTED_IN] -> (m:Movie)
+RETURN m.title, p.name, act.role
+
+
+# P5 (Corregir)
+MATCH (p_dir {name:'Christopher Nolan'})-[:DIRECTED]->(m_N:Movie)
+MATCH (p_in_N:Person) - [act:ACTED_IN] -> (m_N:Movie)
+WHERE NOT EXISTS{
+  MATCH (dir_T {name:'Quentin Tarantino'})-[:DIRECTED]->(m_T:Movie)
+  MATCH (p_in_N) - [act:ACTED_IN] -> (m_T:Movie)}
+RETURN p_in_N.name, m_N.title, act.role
+
+
+# Correcta
+MATCH (p:Person)-[act:ACTED_IN]->(m_N:Movie)<-[:DIRECTED]-(nolan:Person {name:'Christopher Nolan'})
+WHERE NOT EXISTS{
+  MATCH (p:Person)-[:ACTED_IN]->(m_T:Movie)<-[:DIRECTED]-(tarantino:Person {name:'Quentin Tarantino'})}
+RETURN p.name, m_N.title, act.role
+
+# P6
+# [:a|b] para utilizar caminos alternativos, toma a o b
+MATCH (p)-[:FRIEND_OF]->(friend:Person)-[:ACTED_IN|DIRECTED]->(m:Movie)
+WITH p.name AS persona, COUNT(friend) AS amigosActoresDirectores
+RETURN persona, amigosActoresDirectores
+
+# P7
+# OPCION 1: si A es amigo de Margot y ella es amiga de B, retorna A y B
+MATCH (amigos)-[:FRIEND_OF]-(p {name:'Margot Robbie'})-[:FRIEND_OF]-(amigos:Person)
+RETURN DISTINCT amigos.name
+
+# OPCION2
+
+
+
+# P8
+# Asumí que eran los primeros 3 del ranking, no los primeros 3 lugares ya 
+# que el máximo de amigos es 3 y lo tienen 4 personas. 
+MATCH (p)-[:FRIEND_OF]->(friend:Person)
+WITH p.name AS persona, COUNT(friend) AS amigos
+RETURN persona, amigos
+ORDER BY amigos DESC
+LIMIT 3
+
+# P9
+# WHERE p_1.name < p_2.name usado para asegurar que no tenga resultados 
+# duplicados pero en otro orden
+MATCH (p1)-[:ACTED_IN]->(m:Movie)<-[:ACTED_IN]-(p2)
+WHERE p1.name < p2.name 
+WITH p1 AS Actor1, p2 AS Actor2, COUNT(m) AS peliculas
+WHERE peliculas > 1
+RETURN Actor1.name, Actor2.name

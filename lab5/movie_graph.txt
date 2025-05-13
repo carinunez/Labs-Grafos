@@ -1,0 +1,117 @@
+// === PEOPLE ===
+MERGE (leo:Person {name: 'Leonardo DiCaprio', born: 1974})
+MERGE (nolan:Person {name: 'Christopher Nolan', born: 1970})
+MERGE (tarantino:Person {name: 'Quentin Tarantino', born: 1963})
+MERGE (uma:Person {name: 'Uma Thurman', born: 1970})
+MERGE (sam:Person {name: 'Samuel L. Jackson', born: 1948})
+MERGE (travolta:Person {name: 'John Travolta', born: 1954})
+MERGE (matthew:Person {name: 'Matthew McConaughey', born: 1969})
+MERGE (anne:Person {name: 'Anne Hathaway', born: 1982})
+MERGE (ellen:Person {name: 'Elliot Page', born: 1987})
+MERGE (joseph:Person {name: 'Joseph Gordon-Levitt', born: 1981})
+MERGE (denzel:Person {name: 'Denzel Washington', born: 1954})
+MERGE (greta:Person {name: 'Greta Gerwig', born: 1983})
+MERGE (margot:Person {name: 'Margot Robbie', born: 1990})
+MERGE (timothee:Person {name: 'Timothée Chalamet', born: 1995})
+MERGE (denis:Person {name: 'Denis Villeneuve', born: 1967})
+MERGE (florence:Person {name: 'Florence Pugh', born: 1996})
+MERGE (ryan:Person {name: 'Ryan Gosling', born: 1980})
+MERGE (emma:Person {name: 'Emma Stone', born: 1988})
+MERGE (wes:Person {name: 'Wes Anderson', born: 1969})
+MERGE (tilda:Person {name: 'Tilda Swinton', born: 1960})
+MERGE (amy:Person {name: 'Amy Adams', born: 1974})
+MERGE (damien:Person {name: 'Damien Chazelle', born: 1985})
+
+// === MOVIES ===
+MERGE (inception:Movie {title: 'Inception', released: 2010, genre: 'Sci-Fi'})
+MERGE (interstellar:Movie {title: 'Interstellar', released: 2014, genre: 'Sci-Fi'})
+MERGE (pulp:Movie {title: 'Pulp Fiction', released: 1994, genre: 'Crime'})
+MERGE (batman:Movie {title: 'The Dark Knight', released: 2008, genre: 'Action'})
+MERGE (django:Movie {title: 'Django Unchained', released: 2012, genre: 'Western'})
+MERGE (once:Movie {title: 'Once Upon a Time in Hollywood', released: 2019, genre: 'Comedy'})
+MERGE (barbie:Movie {title: 'Barbie', released: 2023, genre: 'Fantasy'})
+MERGE (little:Movie {title: 'Little Women', released: 2019, genre: 'Drama'})
+MERGE (dune:Movie {title: 'Dune', released: 2021, genre: 'Sci-Fi'})
+MERGE (arrival:Movie {title: 'Arrival', released: 2016, genre: 'Sci-Fi'})
+MERGE (laLaLand:Movie {title: 'La La Land', released: 2016, genre: 'Musical'})
+MERGE (french:Movie {title: 'The French Dispatch', released: 2021, genre: 'Comedy'})
+
+// === ACTED_IN ===
+MERGE (leo)-[:ACTED_IN {role: 'Cobb'}]->(inception)
+MERGE (ellen)-[:ACTED_IN {role: 'Ariadne'}]->(inception)
+MERGE (joseph)-[:ACTED_IN {role: 'Arthur'}]->(inception)
+
+MERGE (matthew)-[:ACTED_IN {role: 'Cooper'}]->(interstellar)
+MERGE (anne)-[:ACTED_IN {role: 'Brand'}]->(interstellar)
+
+MERGE (uma)-[:ACTED_IN {role: 'Mia Wallace'}]->(pulp)
+MERGE (sam)-[:ACTED_IN {role: 'Jules'}]->(pulp)
+MERGE (travolta)-[:ACTED_IN {role: 'Vincent'}]->(pulp)
+MERGE (tarantino)-[:ACTED_IN {role: 'Jimmie Dimmick'}]->(pulp)
+
+MERGE (leo)-[:ACTED_IN {role: 'Rick Dalton'}]->(once)
+MERGE (sam)-[:ACTED_IN {role: 'Stephen'}]->(django)
+MERGE (leo)-[:ACTED_IN {role: 'Calvin Candie'}]->(django)
+
+MERGE (margot)-[:ACTED_IN {role: 'Barbie'}]->(barbie)
+MERGE (ryan)-[:ACTED_IN {role: 'Ken'}]->(barbie)
+MERGE (tilda)-[:ACTED_IN {role: 'Narrator'}]->(barbie)
+
+MERGE (emma)-[:ACTED_IN {role: 'Mia'}]->(laLaLand)
+MERGE (ryan)-[:ACTED_IN {role: 'Sebastian'}]->(laLaLand)
+
+MERGE (timothee)-[:ACTED_IN {role: 'Paul Atreides'}]->(dune)
+MERGE (florence)-[:ACTED_IN {role: 'Princess Irulan'}]->(dune)
+
+MERGE (amy)-[:ACTED_IN {role: 'Louise Banks'}]->(arrival)
+
+MERGE (emma)-[:ACTED_IN {role: 'Sister'}]->(little)
+MERGE (florence)-[:ACTED_IN {role: 'Amy March'}]->(little)
+
+MERGE (timothee)-[:ACTED_IN {role: 'Zeffirelli'}]->(french)
+MERGE (tilda)-[:ACTED_IN {role: 'J.K.L. Berensen'}]->(french)
+MERGE (margot)-[:ACTED_IN {role: 'Margot'}]->(french)
+
+// === DIRECTED ===
+MERGE (nolan)-[:DIRECTED]->(inception)
+MERGE (nolan)-[:DIRECTED]->(interstellar)
+MERGE (nolan)-[:DIRECTED]->(batman)
+
+MERGE (tarantino)-[:DIRECTED]->(pulp)
+MERGE (tarantino)-[:DIRECTED]->(django)
+MERGE (tarantino)-[:DIRECTED]->(once)
+
+MERGE (greta)-[:DIRECTED]->(barbie)
+MERGE (greta)-[:DIRECTED]->(little)
+
+MERGE (denis)-[:DIRECTED]->(dune)
+MERGE (denis)-[:DIRECTED]->(arrival)
+
+MERGE (wes)-[:DIRECTED]->(french)
+MERGE (damien)-[:DIRECTED]->(laLaLand)
+
+// === FRIEND_OF ===
+MERGE (leo)-[:FRIEND_OF]->(nolan)
+MERGE (leo)-[:FRIEND_OF]->(tarantino)
+MERGE (sam)-[:FRIEND_OF]->(travolta)
+MERGE (uma)-[:FRIEND_OF]->(tarantino)
+MERGE (anne)-[:FRIEND_OF]->(nolan)
+
+MERGE (margot)-[:FRIEND_OF]->(ryan)
+MERGE (margot)-[:FRIEND_OF]->(greta)
+MERGE (timothee)-[:FRIEND_OF]->(florence)
+MERGE (timothee)-[:FRIEND_OF]->(tilda)
+MERGE (emma)-[:FRIEND_OF]->(ryan)
+MERGE (emma)-[:FRIEND_OF]->(greta)
+MERGE (greta)-[:FRIEND_OF]->(wes)
+MERGE (denis)-[:FRIEND_OF]->(nolan)
+MERGE (damien)-[:FRIEND_OF]->(emma)
+MERGE (tilda)-[:FRIEND_OF]->(wes)
+MERGE (sam)-[:FRIEND_OF]->(tilda)
+MERGE (anne)-[:FRIEND_OF]->(amy);
+
+MATCH (x)-[:FRIEND_OF]->(y)
+WHERE NOT EXISTS {
+  MATCH (y)-[:FRIEND_OF]->(x)
+}
+CREATE (y)-[:FRIEND_OF]->(x);
